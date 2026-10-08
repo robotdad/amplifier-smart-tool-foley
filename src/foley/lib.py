@@ -2,6 +2,18 @@
 
 from pathlib import Path
 
+from foley.capabilities.audition.audition import audition as audition
+from foley.capabilities.create.create import create as create
+from foley.capabilities.doctor.doctor import doctor as doctor
+from foley.capabilities.export.export import export as export
+from foley.capabilities.inspect.inspect import inspect as inspect
+from foley.capabilities.list.list import list_sounds as list_sounds
+from foley.capabilities.models.models import models as models
+from foley.capabilities.recipe.recipe import RECIPES as RECIPES
+from foley.capabilities.recipe.recipe import recipe as recipe
+from foley.capabilities.render.render import render as render
+from foley.capabilities.revise.revise import revise as revise
+from foley.capabilities.variants.variants import variants as variants
 from foley.core import manifest
 from foley.core import skill as skill_module
 from foley.schemas import Manifest

@@ -9,8 +9,9 @@ Install:
 - [Git](https://git-scm.com/)
 - [uv](https://docs.astral.sh/uv/getting-started/installation/): Manages Python environments
 - [prek](https://github.com/j178/prek): Used for precommit hooks. Recommended to install through PyPI/uv with `uv tool install prek`. Use `uv tool upgrade prek` to update it.
-- [GitHub CLI](https://cli.github.com/) for intelligence features with GitHub Copilot.
-- [GitHub Copilot subscription](https://github.com/github/copilot-cli#prerequisites) for intelligent features.
+- [Csound 6.18+](https://csound.com/download.html) for real rendering tests.
+- Provider credentials only for explicitly authorized live trials. Offline tests
+  use a loopback HTTP provider and need no credentials or paid calls.
 
 ### Initial Setup
 
@@ -77,6 +78,14 @@ Run tests:
 ```bash
 uv run pytest
 ```
+
+If the host sets UV_OVERRIDE, unset it for this independent project's install and
+checks: `env -u UV_OVERRIDE uv sync --locked`. Do not inherit another app's Agent
+version constraints. `FOLEY_CSOUND` may name a trusted local executable.
+Tests needing Csound explicitly skip when unavailable; skips are not rendering proof.
+To check a wheel rather than checkout imports, run `tests/installed_smoke.py` with
+the installed environment's Python from outside the checkout. It needs Csound and
+uses public `foley.lib` only, creating a temporary isolated library.
 
 #### References
 

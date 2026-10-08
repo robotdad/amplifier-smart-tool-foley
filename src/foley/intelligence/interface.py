@@ -24,6 +24,6 @@ class Intelligence(Protocol):
 
 
 def default_intelligence() -> Intelligence:
-    from foley.intelligence.copilot import CopilotIntelligence
+    from foley.intelligence.agent import AgentIntelligence
 
-    return CopilotIntelligence()
+    return AgentIntelligence()

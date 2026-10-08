@@ -1,87 +1,83 @@
-# Library Reference
+# Library direction
 
-Every capability of Foley is reachable from `foley.lib`.
-All other surfaces, including the CLI, are thin wrappers over the library and add no capability of their own.
+Every capability is reachable from `foley.lib`; CLI and optional MCP adapters only parse and project library calls. The implementation will fill in exact signatures and help alongside the code.
+
+## Core workflow
+
+- `create`: natural-language brief plus explicit provider/model, duration, channels, seed and loop preference -> immutable rendered revision and provenance.
+- `revise`: exact prior revision plus change request, explicit provider/model and optional changed duration -> new rendered child revision, original untouched.
+- `render`: validated typed sound scene -> rendered immutable revision without intelligence.
+- `variants`: exact revision and explicit seeds -> independently retained deterministic alternatives, preserving the base.
+- `list` / `inspect`: discover retained sounds, exact metadata, scene and validation evidence.
+- `export`: exact revision -> WAV and optional portable bundle containing scene/CSD/provenance. Export paths are caller-owned, never model-authored.
+- `audition`: exact retained revision(s) -> self-contained HTML listening/comparison surface with embedded audio and downloads. It must not require an external CDN or rerun generation.
+- `doctor`: deterministic installation, Csound and provider configuration readiness, without exposing credentials or making a paid call.
+- `manifest`: deterministic Smart Tool manifest.
+
+## Domain model
+
+A sound scene contains bounded duration, sample rate, channel count, seed, loop mode and typed layers. Layers specify timing, envelope, gain, source type, pitch/filter motion and pan, permitting original combinations instead of a closed preset selector. A trusted compiler turns validated numeric/enumerated data into Csound. Text is metadata, never inserted as executable code. Render in a private temporary directory with fixed output path, bounded process lifetime and no caller-controlled flags.
+
+Store each published revision atomically in its own directory. Identify parent revisions explicitly; reject traversal and missing targets. Publish only after successful audio validation. Keep failure diagnostics separate from successful result state. Never represent a missing, silent or malformed render as success.
+
+Compiler version 2 gives each noise layer an explicit deterministic `rand` seed
+strictly between 0 and 1 and selects its 31-bit generator. The global Csound seed
+does not control this opcode. Changing only a scene seed now changes actual noise;
+old compiler-version-1 artifacts are preserved, not regenerated or rewritten.
+Reproducibility means the same scene, seed and compiler/engine environment, not
+byte identity across this compiler correction.
+
+The renderer subprocess inherits only PATH, SystemRoot/SYSTEMROOT, WINDIR,
+COMSPEC, PATHEXT, LD_LIBRARY_PATH, DYLD_LIBRARY_PATH,
+DYLD_FALLBACK_LIBRARY_PATH, OPCODE6DIR and OPCODE6DIR64. These are trusted
+operator executable, DLL/library and Csound plugin paths, not scene inputs.
+HOME, USERPROFILE, XDG_CONFIG_HOME, TMPDIR, TMP and TEMP point to its private
+temporary directory; LC_ALL is C. No provider credentials, proxy settings,
+Agent settings or other ambient variables are forwarded. FOLEY_CSOUND is resolved
+by the parent into the fixed executable path, not passed as a renderer variable.
+This narrows inheritance; it is not a sandbox against a malicious installed engine
+or a hostile same-user process.
 
 ## Intelligence
 
-Model-backed capabilities run through the `Intelligence` protocol in `foley.intelligence.interface`:
+The sole shipped intelligence runtime is Amplifier Agent behind the `Intelligence` protocol. Use public session/turn APIs and structured submission. Provider identifiers map openly to OpenAI, Anthropic, Gemini, ChatGPT and GitHub Copilot; no direct service SDK fallback. Supply only sound-design tools/schema and the actual prior scene during revision, not filesystem or shell tools. Preserve caller model and supported effort configuration. Lazy imports keep deterministic work provider-free.
+
+The original Creator scaffold's Copilot SDK implementation was replaced with
+Amplifier Agent; there is no second intelligence path.
+
+## Verification
+
+Offline tests cover admission/scene validation, malicious strings, path constraints, atomic lineage, retained originals, failed renders, provider configuration, CLI help and packaging. Real Csound tests prove sound rendering and audio properties. DTU installed-product trials prove create/revise/export across representative requests and available provider access. Document unsupported or untested paths rather than substituting mock evidence.
+
+## Implemented entry points
 
 ```python
-class Intelligence(Protocol):
-    implementation: str
+from pathlib import Path
+from foley import lib
 
-    def preflight(self) -> None: ...
-    def run(self, request: AgentRequest) -> AgentResult: ...
+scene = lib.recipe("wood-impact", duration=2, seed=17, channels=2, loop=False)
+original = lib.render(scene, store=Path("./sounds"), brief="Wooden prop impact")
+lib.audition([original["id"]], Path("listen.html"), store=Path("./sounds"))
+lib.export(original["id"], Path("wood.wav"), store=Path("./sounds"))
 ```
 
-`preflight` raises `FoleyError` naming what to configure when the implementation cannot run.
-`run` executes one agent: `AgentRequest` holds the prompt, model, optional workspace, and optional output schema; `AgentResult` holds the text, structured output, or error.
-Setting `AgentRequest.resume` to an earlier `AgentResult.session_id` continues that session instead of starting a fresh one, so the agent keeps what it learned.
+`create(brief, store=None, provider="openai", model=None,
+duration=2, channels=2, seed=1, loop=False, reasoning_effort="medium", timeout=300)`
+returns a revision dictionary. `revise(revision, changes, ..., duration=None)`
+inherits duration unless changed and preserves channels/seed/loop. Both accept an
+optional `intelligence` implementation for controlled testing. Model defaults live
+in schemas.py's DEFAULT_MODELS map; omitted models select the chosen provider's
+default. An explicitly supplied model is never substituted.
 
-`default_intelligence()` returns the shipped implementation, `CopilotIntelligence`, built on the [GitHub Copilot SDK](https://github.com/github/copilot-sdk) and signed in through the GitHub CLI.
-Another implementation is a module satisfying the protocol and a branch in that factory.
+`variants(revision, seeds, store=None)` returns up to eight child dictionaries.
+`inspect(revision, store=None)` verifies payload hashes and returns metadata.
+`list_sounds(store=None)` lists retained revisions. `export(revision, destination,
+bundle=False, store=None)` writes a new WAV/ZIP. `audition(revisions, destination,
+store=None)` writes self-contained HTML. `doctor(providers=False)` checks readiness.
+`models(provider)` uses public Agent discovery; catalogs can require network access.
 
-## Manifest
-
-The tool's `SMART_TOOL.md` as structured data: the frontmatter as fields, the Markdown below it as `Manifest.body`.
-
-```python
-def load_manifest() -> Manifest
-```
-
-## Skill
-
-What an agent reads once it has decided to drive the tool: the manifest body and the capability list, wrapped so the reader knows where the tool's files are.
-Naming a capability returns that capability's own skill instead: the same wrapper, a heading carrying the capability's name, whether it is deterministic or model-backed, and the Markdown beside its code, which covers its arguments, a worked invocation, its result, and its failures.
-The CLI's `--help` prints exactly this, the tool's at the root and the capability's on a command.
-Raises `FoleyError` when the name is not a capability, naming the ones that are.
-
-```python
-def skill(capability: str | None = None) -> str
-```
-
-The capabilities the skill lists, one entry each, driven by the same table the CLI is built from:
-
-```python
-class Capability(NamedTuple):
-    name: str
-    summary: str
-    model_backed: bool
-    skill: str
-    resources: tuple[str, ...] = ()
-```
-
-- `name` and `summary`: the command's name and its line in the tool's capability list.
-- `model_backed`: whether it runs through the `Intelligence` interface, which decides the kind shown in both skills.
-- `skill`: the capability's skill body, a Markdown file relative to `skill_directory()`, written without frontmatter, title, or kind line because the renderer supplies them.
-- `resources`: the files that body refers to, relative to `skill_directory()`, listed under `<skill_resources>` in the capability's skill. The block is omitted when there are none.
-
-The installed package root, resolved at runtime, where the files the skill names can be read.
-
-```python
-def skill_directory() -> Path
-```
-
-The files the skill lists under `<skill_resources>`, as paths relative to `skill_directory()`. Every one ships inside the package, so each resolves after installation.
-The second does the same for one capability's skill, and raises `FoleyError` when the name is not a capability.
-
-```python
-def skill_resources() -> list[str]
-
-
-def capability_skill_resources(capability: str) -> list[str]
-```
-
-The tool's canonical source, read from the package metadata's `[project.urls]` `Repository` entry, or `None` when the package declares none.
-The skill carries it so a caller that can run the tool but not read its files still reaches the documentation.
-
-```python
-def repository_url() -> str | None
-```
-
-## Adding a capability
-
-A capability's code goes in `foley/capabilities/<name>/`, with its prompts, templates, and its own `SKILL.md` beside it, named on its row in `core/skill.py` `CAPABILITIES`, and `lib.py` gets a facade function that imports it and is the only caller of it.
-Each capability of the library gets a section here: what it does and when to reach for it, the signature `lib.py` exposes, what each argument means, and what it returns or raises.
-Model-backed capabilities say so, and take `model` and `reasoning_effort`, defaulting to `DEFAULT_INTELLIGENCE_MODEL` and `medium` from `foley.schemas`.
+`Scene` and `Layer` in `foley.scene` expose the complete JSON schema, bounds and
+temporal validators. Deterministic paths do not import `amplifier_agent`.
+Existing export/audition destinations are refused. A variants batch retains any
+already-published children if a later render fails. Integrity hashes detect
+accidental changes, not a hostile same-user writer replacing data and hashes.

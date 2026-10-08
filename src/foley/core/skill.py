@@ -13,6 +13,22 @@ DISTRIBUTION = "foley"
 # the Markdown beside its code, at `capabilities/<name>/SKILL.md`.
 CAPABILITIES = (
     Capability("manifest", "Print the tool's manifest as JSON.", model_backed=False, skill="core/manifest.md"),
+    *(
+        Capability(name, summary, model_backed=name in {"create", "revise"}, skill=f"capabilities/{name}/SKILL.md")
+        for name, summary in (
+            ("create", "Design and render a sound from a natural-language brief."),
+            ("revise", "Render a changed child of an exact retained revision."),
+            ("recipe", "Print a composable scene for a deterministic starting point."),
+            ("render", "Render a typed JSON scene using Csound, without a model."),
+            ("variants", "Render seeded children with small pitch variations."),
+            ("list", "List retained revisions with integrity verification."),
+            ("inspect", "Read a revision's scene, lineage, provenance and audio measurements."),
+            ("audition", "Build a self-contained HTML audition and comparison."),
+            ("export", "Export WAV or a reproducible audit ZIP."),
+            ("doctor", "Check Csound and optional public provider readiness."),
+            ("models", "Discover model IDs through public Amplifier Agent."),
+        )
+    ),
 )
 
 # Paths relative to the skill directory. Both ship inside the package, so both resolve after installation.

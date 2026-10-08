@@ -24,6 +24,24 @@ foley manifest
 
 `lib.load_manifest()`, printed as JSON.
 
-## Adding a command
+## Workshop commands
 
-Each command gets a section here: the invocation shape with its options and defaults, which library function it calls, and what it prints and exits with. Argument meanings belong in the library reference, not here.
+```bash
+foley doctor --providers
+foley models --provider openai
+foley create "Wooden impact" --provider openai --model gpt-6-astra --duration 2 --store ./sounds
+foley revise REVISION "Softer attack" --duration 3 --store ./sounds
+foley recipe --name rain --duration 4 --loop > rain.json
+foley render rain.json --store ./sounds
+foley variants REVISION --seed 4 --seed 5 --store ./sounds
+foley list --store ./sounds
+foley inspect REVISION --store ./sounds
+foley audition ORIGINAL CHILD --destination compare.html --store ./sounds
+foley export REVISION effect.wav --store ./sounds
+foley export REVISION effect.zip --bundle --store ./sounds
+```
+
+All results are JSON on stdout. `recipe` prints only scene JSON for redirection.
+`--help` carries every parameter and failure; `-h` shows parser defaults.
+Capability names map to library functions except `list` -> `list_sounds` and
+`manifest` -> `load_manifest`. No CLI-only synthesis logic.

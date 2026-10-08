@@ -12,18 +12,18 @@ platforms:
   - macos
   - windows
 requires:
-  - name: gh
+  - name: csound
     purpose: >-
-      Generates the token that signs in to GitHub Copilot. Without it, the model-backed
-      capabilities cannot authenticate.
-    optional: true
-    install: https://cli.github.com/
-  - name: github-copilot-subscription
+      Synthesizes validated scenes into production WAV files. Required for render,
+      create, revise and variants; not for inspecting or exporting retained sounds.
+    optional: false
+    install: https://csound.com/download.html
+  - name: model-provider-credentials
     purpose: >-
-      A Copilot subscription on the account signed in to gh powers the model-backed
-      capabilities. Without it, only the deterministic capabilities run.
+      One supported Amplifier Agent provider account for natural-language creation
+      and revision. Deterministic capabilities do not require credentials.
     optional: true
-    install: https://github.com/github/copilot-cli#prerequisites
+    install: https://github.com/microsoft/amplifier-agent/blob/v0.22.0/docs/providers.md
 ---
 
 Design, audition, revise, and export production sound effects with Csound and Amplifier Agent.
@@ -46,7 +46,7 @@ repository's `docs/01-library.md` and `docs/02-cli.md` carry the rest.
 
 ```bash
 # as a CLI
-uv tool install git+https://github.com/robotdad/amplifier-smart-tool-foley
+uv tool install git+https://github.com/robotdad/amplifier-smart-tool-foley@main
 
 # as a library, from another project
 uv add "foley @ git+https://github.com/robotdad/amplifier-smart-tool-foley"
@@ -58,18 +58,22 @@ Verify with `foley manifest`, which needs no credentials.
 
 ## Prerequisites
 
-Deterministic capabilities need only `uv`. Model-backed capabilities run through GitHub
-Copilot, signed in as the GitHub CLI's user: `gh` must be installed and `gh auth login`
-completed with an account that has a Copilot subscription. Without that, a model-backed
-capability fails immediately and names what to configure; it never falls back to a
-deterministic answer.
+Csound 6.18+ on PATH is required for synthesis. FOLEY_CSOUND may select a trusted
+executable. `doctor` checks local readiness; `doctor --providers` checks public
+Amplifier Agent provider configuration without generating content.
 
-Runs on Linux, macOS, and Windows.
+OpenAI, Anthropic, Gemini, ChatGPT and GitHub Copilot are supported through public
+Amplifier Agent. Choose both provider and exact model ID. Credentials remain outside
+scenes and artifacts. Missing auth never triggers login or deterministic substitution.
+Linux is locally exercised; other platform installation instructions are unverified.
 
 ## Straight and smart paths
 
-Deterministic capabilities run with no provider configured. Model-backed capabilities go
-through GitHub Copilot, signed in as the GitHub CLI's user, and say so in their help text.
+Deterministic capabilities run with no provider configured. Create/revise are
+model-backed and say so. Start with create -> audition -> revise -> audition both
+IDs -> export. Use recipe -> render without credentials. Inspect and list retain
+lineage; variants makes seeded alternatives. No arbitrary CSD is accepted, no audio
+is sent to the model, and measured waveform validity is not listening review.
 
 ## Output and failure contract
 
