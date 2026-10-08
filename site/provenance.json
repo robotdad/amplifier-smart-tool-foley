@@ -1,0 +1,44 @@
+{
+  "theme": {
+    "repository": "https://github.com/microsoft/amplifier-smart-tools-catalog",
+    "commit": "59339a5c52aa909f7f7e18c2c92de82ec66eae4c",
+    "path": "site/theme",
+    "version": "0.1.0",
+    "license": "theme/LICENSE",
+    "canonical_theme": "https://github.com/microsoft/amplifier-smart-tools/tree/main/site/theme",
+    "verified": "All eight source files matched the GitHub git-tree blob IDs before local adaptation.",
+    "upstream_sha256": {
+      "LICENSE": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+      "assets/mark-loop.gif": "5d56ab191e9da10c3e1505e5809cc171d5e255747797101a5f71b6ee9121206e",
+      "assets/mark-loop.mp4": "30ffe769b1ed48821a0209b5c6c2f812e1f6a060ca22be44da3d39c936f3641a",
+      "assets/mark-loop.png": "778da2e4475e1bfb64cc8add3ebd599d3892db08b47c568291e8e9a4cfc8f7e0",
+      "build.py": "5ec053f9d4846600bdeae2c57b5e771ca2b20b78d46c4167f45a3ee772399707",
+      "family.json": "3d326cc195e767e6a89efc894802692d9d0afb2ea0b9119c18d588cc78006986",
+      "site.js": "ce8d2bf1add562fa6ab2e6b0abab74a49d51f0959863b086de7d30b37e2de122",
+      "style.css": "9f87606ad071c908917c0e0620343f432e9fae27fbe66d994effc4369bdc969b"
+    },
+    "local_changes": {
+      "site.js": "Show the real static logo image when paused or reduced, switch to the native-controls video only on actual playback, synchronize native pause with the accessible global motion button, and retain readable still/retry on autoplay rejection.",
+      "style.css": "Allow the media-action links to wrap without overflowing narrow screens. Honor hidden on the static-image/video pair so native controls cannot obscure the paused logo.",
+      "family.json": "Add Foley under robotdad; preserve every existing family entry.",
+      "build.py": "Expose the shared motion toggle on static tool pages too. Give Foley's transparent poster a validated dark media background, label its video as animation, and link the static logo and artwork provenance. Include the MIT notice as assets/theme-LICENSE.txt in generated output. Apply repository Ruff formatting, rename an ambiguous reader-loop variable, and guard missing/non-string reader hrefs to satisfy the repository type check. The actual upstream tool-page template and shared presentation are retained."
+    },
+    "shared_artwork": "The existing family mark remains separate from Foley branding. Upstream identifies artwork provenance in amplifier-smart-tools/site/artwork; this copy does not claim independent artwork review."
+  },
+  "workflow": {
+    "source": "https://github.com/microsoft/amplifier-smart-tools-catalog/blob/59339a5c52aa909f7f7e18c2c92de82ec66eae4c/.github/workflows/website.yml",
+    "adaptations": "Remove catalog refresh triggers and fork-family override; keep PR builds read-only, deploy only main push or explicit main dispatch, and add structural checks. The tool-page build needs only Python standard library, so no build dependency installation is needed."
+  },
+  "build": "python3 site/theme/build.py --family-owner microsoft",
+  "check": "python3 site/check.py _site",
+  "tests": "uv run pytest site/tests",
+  "preview": "python3 -m http.server 8000 --directory _site --bind 127.0.0.1",
+  "publication": "Enable GitHub Pages with GitHub Actions only after preview approval; allow main in the github-pages environment. Main pushes touching site or workflow then deploy automatically.",
+  "foley_media": {
+    "status": "Actual Unfold-generated logo and animation integrated; not a Foley audio demonstration.",
+    "image": "site/assets/foley-logo.png",
+    "video": "site/assets/foley-logo-motion.mp4",
+    "provenance": "site/assets/foley-brand-provenance.json",
+    "integration": "1186x284 transparent PNG and silent four-second H.264 MP4. The dark #111820 media background preserves the white wordmark contrast. Shared template reduced-motion and global motion controls are retained."
+  }
+}

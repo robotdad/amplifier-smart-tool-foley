@@ -1,0 +1,39 @@
+{
+  "kind": "tool",
+  "key": "foley",
+  "title": "Foley | Sound effects with Csound and Amplifier Agent",
+  "description": "Describe a sound. Foley turns your brief into procedural audio with Csound and Amplifier Agent. Listen, revise a retained version, and export the result.",
+  "name": "Foley",
+  "promise": "Sound effects, shaped through conversation.",
+  "accent": "#486b61",
+  "image": "site/assets/foley-logo.png",
+  "video": "site/assets/foley-logo-motion.mp4",
+  "media_background": "#111820",
+  "alt": "Foley brand animation: an amber impact cue and pale teal sound ripples beside a white Foley wordmark.",
+  "width": 1186,
+  "height": 284,
+  "caption": "Foley brand animation, created with Unfold. Silent identity artwork, not a Foley sound demo.",
+  "flow_title": "Describe. Listen. Shape. Keep.",
+  "flow_intro": "A small sound-effects workshop for your agent, scripts or terminal. Foley is a local library and CLI, not a hosted generator or a DAW. This page is a static introduction.",
+  "steps": [
+    ["Describe the effect.", "Give your agent the action, material, timing and context. Foley uses your chosen provider to design a structured scene, then Csound synthesizes the audio."],
+    ["Listen to what was made.", "Open a self-contained audition page in your browser. Play, seek and download the actual WAV without a server or model connection."],
+    ["Revise without losing the original.", "Ask for a change against an exact version, or make deterministic seeded variations. Keep the original and compare it with its children."],
+    ["Take the sound into your production.", "Export a 48 kHz, 24-bit mono or stereo WAV. Use an audit ZIP when you also want the scene, synthesis source and retained provenance."]
+  ],
+  "detail_title": "Useful controls. Honest limits.",
+  "details": [
+    ["Procedural, not recorded.", "Make impacts, footsteps, whooshes, interface sounds and ambience through synthesis. Sound effects come first; pitched and musical material is possible too. Recorded realism is not promised."],
+    ["Your versions stay yours.", "Revisions retain the brief, change request, parent, scene, seed, audio and checksums. Failed renders cannot replace an existing sound. Seeded rendering is reproducible on the same engine, not guaranteed byte-identical across platforms."],
+    ["Ordinary work needs no model.", "Recipes, rendering, seeded variants, inspection, audition and export work without model credentials. Natural-language creation and revision use Amplifier Agent 0.22."],
+    ["What has been exercised.", "The initial Linux arm64 build passed installed tests and Smart Tool conformance checks. Live creation produced audio through OpenAI, Anthropic, Gemini and GitHub Copilot. Browser checks covered playback, downloads and offline reopening, not listening quality."],
+    ["Known sound-quality gaps.", "The tested metal-impact revision did not measurably reduce its ringing. The tested ventilation loop has a roughly 20.6 dB, 20 ms dip at the join. Loop playback works; seamless ambience is not established. Audition every output before production use."],
+    ["Listen before accepting.", "The model cannot listen to the audio. An automated evaluator failed its controls, so no listening verdict or final quality acceptance is claimed. This is an independently maintained robotdad project using the shared Microsoft family template, not a Microsoft endorsement."]
+  ],
+  "prompt": "Use Foley to make three heavy boot steps on a hollow wooden floor over two seconds. Check the available providers with me before generating. Give me an offline audition page, keep the original, and let me ask for a revision after listening.",
+  "install": "uv tool install git+https://github.com/robotdad/amplifier-smart-tool-foley@main",
+  "prerequisites": "Requires uv, Python 3.13+ and Csound 6.18+ on PATH. Provider credentials are needed only for natural-language design. Linux has been exercised; macOS and Windows instructions are not platform verification.",
+  "model_note": "Adapters support OpenAI, Anthropic, Gemini, ChatGPT and GitHub Copilot. ChatGPT requires its separate Amplifier Agent OAuth login and was not live-tested. Use foley doctor --providers and foley models --provider NAME to check your setup. Explicit provider and model choices are not silently substituted.",
+  "guide": "README.md",
+  "related": ["unfold", "stories", "showrun", "outtake"]
+}
