@@ -1,0 +1,5 @@
+{
+  "manifest": "src/foley/SMART_TOOL.md",
+  "cli_argv": ["foley"],
+  "deterministic_smoke": ["manifest"]
+}
